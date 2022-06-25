@@ -1,71 +1,34 @@
-import * as React from 'react';
-import MapView, {Marker, MarkerAnimated} from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import React, { PureComponent } from "react";
+import { AppRegistry, StyleSheet, StatusBar } from "react-native";
+import { GameEngine } from "react-native-game-engine";
+import { Finger } from "./render";
+import { MoveFinger } from "./system"
 
-interface CoordinateType {
-  latitude: number,
-  longitude: number
-}
+export default class BestGameEver extends PureComponent {
 
-export default function App() {
-  const coords = {
-    latitude: 37.78825, 
-    longiture: -122.4324
+  render() {
+    return (
+      <GameEngine
+        style={styles.container}
+        systems={[MoveFinger]}
+        entities={{
+          1: { position: [40,  200], renderer: <Finger position={[40, 200]} />}, //-- Notice that each entity has a unique id (required)
+          2: { position: [100, 200], renderer: <Finger position={[100, 200]} />}, //-- and a renderer property (optional). If no renderer
+          3: { position: [160, 200], renderer: <Finger position={[160, 200]} />}, //-- is supplied with the entity - it won't get displayed.
+          4: { position: [220, 200], renderer: <Finger position={[220, 200]} />},
+          5: { position: [280, 200], renderer: <Finger position={[280, 200]} />}
+        }}>
+
+        <StatusBar hidden={true} />
+
+      </GameEngine>
+    );
   }
-
-  const [latitudeMarker, setlatitudeMarker] = React.useState(0); 
-  const [longitudeMarker, setlongitudeMarker] = React.useState(0); 
-  
-  const [cords, setCords] = React.useState<CoordinateType[] | null>(null); 
-
-  React.useEffect(() => {
-    let temp = [ {latitude: 37.78825, longitude: -122.4324}, 
-                 {latitude: 35.78825, longitude: -122.4324},
-                 {latitude: 34.78825, longitude: -122.4324},
-                 {latitude: 31.78825, longitude: -122.4324},]
-    setCords(temp)
-  }, [])
-
-  return (
-    <View style={styles.container}>
-      <Text> Example Map: </Text>
-      <MapView style={styles.map}
-          initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}> 
-        {cords && cords.map((coords, i) => {
-          return <Marker
-            key={`#marker${i}`}
-            onPress={(e) => {
-              console.log(e)
-            }}
-            draggable
-            coordinate={{
-              latitude: coords.latitude,
-              longitude: coords.longitude,
-            }}
-            title={"Example Marker"}
-            description={"Example Marker"}
-          />
-        })}
-
-      </MapView>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    width: Dimensions.get('window').width/2,
-    height: Dimensions.get('window').height/2,
-  },
+    backgroundColor: "#FFF"
+  }
 });
