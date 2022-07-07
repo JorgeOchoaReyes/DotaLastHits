@@ -1,34 +1,63 @@
-import React, { PureComponent } from "react";
-import { AppRegistry, StyleSheet, StatusBar } from "react-native";
-import { GameEngine } from "react-native-game-engine";
-import { Finger } from "./render";
-import { MoveFinger } from "./system"
+import React, { useState } from "react";
+import { AppRegistry, StyleSheet, Dimensions, View } from "react-native";
+import { GameLoop, GameLoopUpdateEventOptionType } from "react-native-game-engine";
 
-export default class BestGameEver extends PureComponent {
+const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
+const RADIUS = 25;
 
-  render() {
-    return (
-      <GameEngine
-        style={styles.container}
-        systems={[MoveFinger]}
-        entities={{
-          1: { position: [40,  200], renderer: <Finger position={[40, 200]} />}, //-- Notice that each entity has a unique id (required)
-          2: { position: [100, 200], renderer: <Finger position={[100, 200]} />}, //-- and a renderer property (optional). If no renderer
-          3: { position: [160, 200], renderer: <Finger position={[160, 200]} />}, //-- is supplied with the entity - it won't get displayed.
-          4: { position: [220, 200], renderer: <Finger position={[220, 200]} />},
-          5: { position: [280, 200], renderer: <Finger position={[280, 200]} />}
-        }}>
+const BestGameEver = () => {
+  const [x, setX] = useState(WIDTH/2); 
+  const [y, setY] = useState(HEIGHT/2); 
+  const [startTime, setstartTime] = useState(new Date()); 
 
-        <StatusBar hidden={true} />
+  const [e_x, sete_x] = useState(WIDTH/2);
+  const [e_y, sete_y] = useState(0);   
 
-      </GameEngine>
-    );
+  const updateHandler = ({ touches, screen, time}: GameLoopUpdateEventOptionType ) => {
+    let move = touches.find(x => x.type === "move");
+
+    let endTime = new Date();
+    let timeDiff = endTime.getTime() - startTime.getTime(); 
+    timeDiff /= 1000;
+    let seconds = Math.round(timeDiff);
+    sete_y(e_y + seconds)
+    if (move) {
+      setX(x + move.delta!.pageX)
+      setY(y + move.delta!.pageY)
+
+    y
+    };
   }
+
+  return (
+    <GameLoop style={styles.container} onUpdate={updateHandler}>
+      <View style={[styles.player, { left: x, top: y }]} />
+
+      <View style={[styles.player, { left: e_x, top: e_y }]} />
+    </GameLoop>
+  );
+  
 }
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF"
-  }
+  },
+  player: {
+    position: "absolute",
+    backgroundColor: "red",
+    width: RADIUS * 2,
+    height: RADIUS * 2,
+  },  
+  enemy: {
+    position: "absolute",
+    backgroundColor: "green",
+    width: RADIUS * 2,
+    height: RADIUS * 2,
+  },
 });
+
+  
+export default BestGameEver; 
